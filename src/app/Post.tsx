@@ -1,17 +1,24 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Picker, Text, StyleSheet, TextInput } from 'react-native';
+import {
+	View,
+	Text,
+	StyleSheet,
+	TextInput,
+	TouchableOpacity,
+} from 'react-native';
 import { apiService } from '../utils/api';
 import {
 	findWithId,
 	calculateDiff,
 	calculateIndex,
 } from '../utils/calculations';
-import { AppButton } from '../shared/AppButton';
-import { TableScore } from '../utils/types';
+import { TableScore, GolfCourse, TeeBox } from '../utils/types';
 import { LoadingCircle } from '../shared/LoadingCircle';
 import { AuthContext } from '../auth/AuthProvider';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AppParamList } from '../types/AppParamList';
+import { CoursePicker } from '../pickers/CoursePicker';
+import { TeePicker } from '../pickers/TeePicker';
 
 interface PostProps {
 	navigation: StackNavigationProp<AppParamList, 'Post'>;
@@ -21,11 +28,26 @@ export const Post: React.FC<PostProps> = ({ navigation }) => {
 	const { postNewData } = useContext(AuthContext);
 
 	const [courses, setCourses] = useState<GolfCourse[]>([]);
-	const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+	const [selectedCourse, setSelectedCourse] = useState<GolfCourse>({
+		id: 0,
+		clubname: 'Select Your Course',
+		city: '',
+		state: '',
+		tees: [],
+	});
 	const [teeBoxOptions, setTeeBoxOptions] = useState<TeeBox[]>([]);
-	const [selectedTee, setSelectedTee] = useState<TeeBox | null>(null);
+	const [selectedTee, setSelectedTee] = useState<TeeBox>({
+		name: '',
+		gender: '',
+		par: 0,
+		courseRating: 0,
+		bogeyRating: 0,
+		slopeRating: 0,
+	});
 	const [score, setScore] = useState<string>('');
 	const [loading, setLoading] = useState(true);
+	const [showCoursePicker, setShowCoursePicker] = useState(false);
+	const [showTeePicker, setShowTeePicker] = useState(false);
 
 	const getData = async () => {
 		let courses: GolfCourse[] = [];
@@ -72,49 +94,61 @@ export const Post: React.FC<PostProps> = ({ navigation }) => {
 		getData();
 	}, []);
 
-	const handleCourseSelect = (course: any) => {
+	const handleCourseSelect = (course: GolfCourse) => {
 		setLoading(true);
 		setSelectedCourse(course);
-		if (course === '0') {
+		if (course.clubname === 'Select Your Course') {
 			setTeeBoxOptions([]);
+			setSelectedTee({
+				name: '',
+				gender: '',
+				par: 0,
+				courseRating: 0,
+				bogeyRating: 0,
+				slopeRating: 0,
+			});
 		} else {
-			let index = findWithId(courses, Number(course));
+			let index = findWithId(courses, course.id);
 			setTeeBoxOptions(courses[index].tees);
 		}
 		setLoading(false);
 	};
 
-	const handleTeeSelect = (teeBox: string) => {
-		if (teeBox !== '0') {
-			let teeObject: TeeBox = JSON.parse(teeBox);
-			setSelectedTee(teeObject);
+	const handleTeeSelect = (teeBox: TeeBox) => {
+		if (teeBox.name !== 'Select Your Tees') {
+			setSelectedTee(teeBox);
 		} else {
-			setSelectedTee(null);
+			setSelectedTee({
+				name: '',
+				gender: '',
+				par: 0,
+				courseRating: 0,
+				bogeyRating: 0,
+				slopeRating: 0,
+			});
 		}
 	};
 
 	const handlePostedScore = async () => {
 		// calculate differential and post new score to scores DB
-		if (selectedTee) {
-			let differential = calculateDiff(
-				Number(score),
-				selectedTee.courseRating,
-				selectedTee.slopeRating
-			);
-			let result = await apiService(
-				'https://pressgolfapp.herokuapp.com/api/scores',
-				'POST',
-				{
-					userid: 8,
-					courseid: Number(selectedCourse),
-					score: Number(score),
-					differential,
-					teeName: selectedTee.name,
-					teeGender: selectedTee.gender,
-				}
-			);
-			// console.log(differential);
-		}
+
+		let differential = calculateDiff(
+			Number(score),
+			selectedTee.courseRating,
+			selectedTee.slopeRating
+		);
+		let result = await apiService(
+			'https://pressgolfapp.herokuapp.com/api/scores',
+			'POST',
+			{
+				userid: 8,
+				courseid: selectedCourse.id,
+				score: Number(score),
+				differential,
+				teeName: selectedTee.name,
+				teeGender: selectedTee.gender,
+			}
+		);
 
 		// get all scores (including new) and make a post request to user DB with new score and update index
 		let scores = await apiService(
@@ -135,8 +169,13 @@ export const Post: React.FC<PostProps> = ({ navigation }) => {
 			console.log('finished posting!!');
 		}
 		postNewData();
-		setSelectedCourse(null);
-		handleCourseSelect('0');
+		handleCourseSelect({
+			id: 0,
+			clubname: 'Select Your Course',
+			city: '',
+			state: '',
+			tees: [],
+		});
 		setScore('');
 
 		navigation.navigate('Profile');
@@ -147,89 +186,103 @@ export const Post: React.FC<PostProps> = ({ navigation }) => {
 	}
 
 	return (
-		<>
-			<View style={styles.container}>
-				<Text>Course Select</Text>
-				<Picker
-					selectedValue={selectedCourse}
-					style={{ height: 50, width: 350 }}
-					onValueChange={itemValue => handleCourseSelect(itemValue)}
+		<View style={styles.container}>
+			<View style={styles.subContainer}>
+				<TouchableOpacity
+					style={styles.courseButton}
+					onPress={() => setShowCoursePicker(true)}
 				>
-					<Picker.Item label="--Select One--" value="0" />
-					{courses.map(course => {
-						return (
-							<Picker.Item
-								key={course.id}
-								label={course.clubname}
-								value={course.id}
-							/>
-						);
-					})}
-				</Picker>
+					<Text style={{ fontSize: 32, color: '#fff', textAlign: 'center' }}>
+						{selectedCourse.clubname}
+					</Text>
+				</TouchableOpacity>
 			</View>
-			<View style={styles.container}>
-				<Text>Tee Select</Text>
-				<Picker
-					selectedValue={JSON.stringify(selectedTee)}
-					style={{ height: 50, width: 350 }}
-					onValueChange={itemValue => handleTeeSelect(itemValue)}
+
+			<View style={styles.subContainer}>
+				<TouchableOpacity
+					style={styles.teeButton}
+					onPress={() => {
+						if (selectedCourse.id === 0) alert('Pick a course!');
+						else setShowTeePicker(true);
+					}}
 				>
-					<Picker.Item label="--Select One--" value="0" />
-					{teeBoxOptions.map(teeBox => {
-						return (
-							<Picker.Item
-								key={`${teeBox.name}-${teeBox.gender}`}
-								label={`${teeBox.name} - (${teeBox.courseRating} / ${teeBox.slopeRating}) (${teeBox.gender})`}
-								value={JSON.stringify(teeBox)}
-							/>
-						);
-					})}
-				</Picker>
+					<Text style={{ fontSize: 32, color: '#fff', textAlign: 'center' }}>
+						{selectedTee.name
+							? `${selectedTee.name} - (${selectedTee.courseRating} / ${selectedTee.slopeRating}) (${selectedTee.gender})`
+							: 'Select Your Tee'}
+					</Text>
+				</TouchableOpacity>
 			</View>
-			<View style={styles.container}>
-				<Text>Score</Text>
+
+			<View style={styles.subContainer}>
 				<TextInput
 					style={{
-						height: 40,
-						width: 80,
-						borderColor: 'gray',
-						borderWidth: 1,
+						height: '100%',
+						fontSize: 32,
+						textAlign: 'center',
+						backgroundColor: '#fff',
 					}}
+					placeholder="Enter Score"
 					onChangeText={score => setScore(score)}
 					value={score}
 					// keyboardType="number-pad"
 				/>
-				{selectedTee && score !== '' && (
-					<View style={{ marginTop: 40 }}>
-						<AppButton onPress={handlePostedScore} title="Post Score" />
-					</View>
-				)}
 			</View>
-		</>
+			<View style={styles.subContainer}>
+				<TouchableOpacity
+					disabled={
+						selectedCourse.id === 0 || selectedTee.name === '' || !score
+					}
+					onPress={handlePostedScore}
+					style={styles.postButton}
+				>
+					<Text style={{ fontSize: 32, color: '#fff' }}>Post Score</Text>
+				</TouchableOpacity>
+			</View>
+			<CoursePicker
+				visible={showCoursePicker}
+				courses={courses}
+				onClose={() => setShowCoursePicker(false)}
+				onSelect={course => handleCourseSelect(course)}
+				value={selectedCourse}
+			/>
+			<TeePicker
+				visible={showTeePicker}
+				tees={teeBoxOptions}
+				onClose={() => setShowTeePicker(false)}
+				onSelect={teeBox => handleTeeSelect(teeBox)}
+				value={selectedTee}
+			/>
+		</View>
 	);
 };
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		paddingTop: 20,
+	},
+	subContainer: {
+		flex: 1,
+	},
+	courseButton: {
+		justifyContent: 'center',
 		alignItems: 'center',
+		height: '100%',
+		backgroundColor: 'seagreen',
+		padding: 30,
+	},
+	teeButton: {
+		justifyContent: 'center',
+		alignItems: 'center',
+		height: '100%',
+		backgroundColor: 'steelblue',
+		padding: 30,
+	},
+	postButton: {
+		justifyContent: 'center',
+		alignItems: 'center',
+		height: '100%',
+		backgroundColor: 'indianred',
+		padding: 30,
 	},
 });
-
-interface GolfCourse {
-	id: number;
-	clubname: string;
-	city: string;
-	state: string;
-	tees: TeeBox[];
-}
-
-interface TeeBox {
-	name: string;
-	gender: string;
-	par: number;
-	courseRating: number;
-	bogeyRating: number;
-	slopeRating: number;
-}

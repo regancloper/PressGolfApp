@@ -45,3 +45,20 @@ export type RoundData = {
 	selectedTee: string;
 	playingPartner: Friend | null;
 };
+
+export interface GolfCourse {
+	id: number;
+	clubname: string;
+	city: string;
+	state: string;
+	tees: TeeBox[];
+}
+
+export interface TeeBox {
+	name: string;
+	gender: string;
+	par: number;
+	courseRating: number;
+	bogeyRating: number;
+	slopeRating: number;
+}

@@ -4,16 +4,20 @@ import {
 	Picker,
 	Text,
 	StyleSheet,
-	ActivityIndicator,
 	Button,
+	TouchableOpacity,
+	TextInput,
 } from 'react-native';
 import { apiService } from '../utils/api';
-import { Center } from '../shared/Center';
 import { findWithId } from '../utils/calculations';
-import { Friend } from '../utils/types';
+import { Friend, GolfCourse, TeeBox } from '../utils/types';
 import { PlayParamList } from '../types/PlayParamList';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthContext } from '../auth/AuthProvider';
+import { LoadingCircle } from '../shared/LoadingCircle';
+import { CoursePicker } from '../pickers/CoursePicker';
+import { TeePicker } from '../pickers/TeePicker';
+import { FriendPicker } from '../pickers/FriendPicker';
 
 interface PlaySetupProps {
 	navigation: StackNavigationProp<PlayParamList, 'PlaySetup'>;
@@ -23,12 +27,33 @@ export const PlaySetup: React.FC<PlaySetupProps> = ({ navigation }) => {
 	const { user } = useContext(AuthContext);
 
 	const [courses, setCourses] = useState<GolfCourse[]>([]);
-	const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+	const [selectedCourse, setSelectedCourse] = useState<GolfCourse>({
+		id: 0,
+		clubname: 'Select Your Course',
+		city: '',
+		state: '',
+		tees: [],
+	});
 	const [teeBoxOptions, setTeeBoxOptions] = useState<TeeBox[]>([]);
-	const [selectedTee, setSelectedTee] = useState<TeeBox | null>(null);
+	const [selectedTee, setSelectedTee] = useState<TeeBox>({
+		name: '',
+		gender: '',
+		par: 0,
+		courseRating: 0,
+		bogeyRating: 0,
+		slopeRating: 0,
+	});
 	const [loading, setLoading] = useState(true);
 	const [friends, setFriends] = useState<Friend[]>([]);
-	const [playingPartner, setPlayingPartner] = useState<Friend | null>(null);
+	const [playingPartner, setPlayingPartner] = useState<Friend>({
+		id: 0,
+		firstname: '',
+		lastname: '',
+		index: 0,
+	});
+	const [showCoursePicker, setShowCoursePicker] = useState(false);
+	const [showTeePicker, setShowTeePicker] = useState(false);
+	const [showFriendPicker, setShowFriendPicker] = useState(false);
 
 	const getData = async () => {
 		let courses: GolfCourse[] = [];
@@ -79,130 +104,160 @@ export const PlaySetup: React.FC<PlaySetupProps> = ({ navigation }) => {
 		getData();
 	}, []);
 
-	const handleCourseSelect = (course: any) => {
+	const handleCourseSelect = (course: GolfCourse) => {
 		setLoading(true);
 		setSelectedCourse(course);
-		if (course === '0') {
+		if (course.clubname === 'Select Your Course') {
 			setTeeBoxOptions([]);
+			setSelectedTee({
+				name: '',
+				gender: '',
+				par: 0,
+				courseRating: 0,
+				bogeyRating: 0,
+				slopeRating: 0,
+			});
 		} else {
-			let index = findWithId(courses, Number(course));
+			let index = findWithId(courses, course.id);
 			setTeeBoxOptions(courses[index].tees);
 		}
 		setLoading(false);
 	};
 
-	const handleTeeSelect = (teeBox: string) => {
-		if (teeBox !== '0') {
-			let teeObject: TeeBox = JSON.parse(teeBox);
-			setSelectedTee(teeObject);
+	const handleTeeSelect = (teeBox: TeeBox) => {
+		if (teeBox.name !== 'Select Your Tees') {
+			setSelectedTee(teeBox);
 		} else {
-			setSelectedTee(null);
+			setSelectedTee({
+				name: '',
+				gender: '',
+				par: 0,
+				courseRating: 0,
+				bogeyRating: 0,
+				slopeRating: 0,
+			});
 		}
 	};
 
-	const handleFriendSelect = (friend: string) => {
-		let friendObject: Friend = JSON.parse(friend);
-		setPlayingPartner(friendObject);
+	const handleFriendSelect = (friend: Friend) => {
+		if (friend.firstname !== '') {
+			setPlayingPartner(friend);
+		} else {
+			setPlayingPartner({
+				id: 0,
+				firstname: '',
+				lastname: '',
+				index: 0,
+			});
+		}
 	};
 
 	if (loading) {
-		return (
-			<Center>
-				<ActivityIndicator size="large" />
-			</Center>
-		);
+		return <LoadingCircle />;
 	}
 
 	return (
-		<>
-			<View style={styles.container}>
-				<Text>Course Select</Text>
-				<Picker
-					selectedValue={selectedCourse}
-					style={{ height: 50, width: 350 }}
-					onValueChange={itemValue => handleCourseSelect(itemValue)}
+		<View style={styles.container}>
+			<View style={styles.subContainer}>
+				<TouchableOpacity
+					style={styles.courseButton}
+					onPress={() => setShowCoursePicker(true)}
 				>
-					<Picker.Item label="--Select One--" value="0" />
-					{courses.map(course => {
-						return (
-							<Picker.Item
-								key={course.id}
-								label={course.clubname}
-								value={course.id}
-							/>
-						);
-					})}
-				</Picker>
+					<Text style={{ fontSize: 32, color: '#fff', textAlign: 'center' }}>
+						{selectedCourse.clubname}
+					</Text>
+				</TouchableOpacity>
 			</View>
-			<View style={styles.container}>
-				<Text>Tee Select</Text>
-				<Picker
-					selectedValue={JSON.stringify(selectedTee)}
-					style={{ height: 50, width: 350 }}
-					onValueChange={itemValue => handleTeeSelect(itemValue)}
+
+			<View style={styles.subContainer}>
+				<TouchableOpacity
+					style={styles.teeButton}
+					onPress={() => {
+						if (selectedCourse.id === 0) alert('Pick a course!');
+						else setShowTeePicker(true);
+					}}
 				>
-					<Picker.Item label="--Select One--" value="0" />
-					{teeBoxOptions.map(teeBox => {
-						return (
-							<Picker.Item
-								key={`${teeBox.name}-${teeBox.gender}`}
-								label={`${teeBox.name} - (${teeBox.courseRating} / ${teeBox.slopeRating}) (${teeBox.gender})`}
-								value={JSON.stringify(teeBox)}
-							/>
-						);
-					})}
-				</Picker>
+					<Text style={{ fontSize: 32, color: '#fff', textAlign: 'center' }}>
+						{selectedTee.name
+							? `${selectedTee.name} - (${selectedTee.courseRating} / ${selectedTee.slopeRating}) (${selectedTee.gender})`
+							: 'Select Your Tee'}
+					</Text>
+				</TouchableOpacity>
 			</View>
-			<View style={styles.container}>
-				<Text>Playing With:</Text>
-				<Picker
-					selectedValue={JSON.stringify(playingPartner)}
-					style={{ height: 50, width: 350 }}
-					onValueChange={itemValue => handleFriendSelect(itemValue)}
+
+			<View style={styles.subContainer}>
+				<TouchableOpacity
+					style={styles.friendButton}
+					onPress={() => setShowFriendPicker(true)}
 				>
-					<Picker.Item label="--Playing Solo--" value="0" />
-					{friends.map(friend => {
-						return (
-							<Picker.Item
-								key={`friend-${user.userid}-${friend.id}`}
-								label={`${friend.firstname} ${friend.lastname}`}
-								value={JSON.stringify(friend)}
-							/>
-						);
-					})}
-				</Picker>
+					<Text style={{ fontSize: 32, color: '#fff', textAlign: 'center' }}>
+						{playingPartner.firstname
+							? `${playingPartner.firstname} ${playingPartner.lastname}`
+							: 'Pick A Friend'}
+					</Text>
+				</TouchableOpacity>
 			</View>
-			<View>
-				<Button
-					title="Start Playing"
-					onPress={() => navigation.navigate('Scorecard')}
-				/>
+			<View style={styles.subContainer}>
+				<TouchableOpacity style={styles.playButton}>
+					<Text style={{ fontSize: 32, color: '#fff' }}>Play Golf</Text>
+				</TouchableOpacity>
 			</View>
-		</>
+
+			<CoursePicker
+				visible={showCoursePicker}
+				courses={courses}
+				onClose={() => setShowCoursePicker(false)}
+				onSelect={course => handleCourseSelect(course)}
+				value={selectedCourse}
+			/>
+			<TeePicker
+				visible={showTeePicker}
+				tees={teeBoxOptions}
+				onClose={() => setShowTeePicker(false)}
+				onSelect={teeBox => handleTeeSelect(teeBox)}
+				value={selectedTee}
+			/>
+			<FriendPicker
+				visible={showFriendPicker}
+				friends={friends}
+				onClose={() => setShowFriendPicker(false)}
+				onSelect={friend => handleFriendSelect(friend)}
+				value={playingPartner}
+			/>
+		</View>
 	);
 };
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		paddingTop: 20,
+	},
+	subContainer: {
+		flex: 1,
+	},
+	courseButton: {
+		justifyContent: 'center',
 		alignItems: 'center',
+		height: '100%',
+		backgroundColor: 'seagreen',
+	},
+	teeButton: {
+		justifyContent: 'center',
+		alignItems: 'center',
+		height: '100%',
+		backgroundColor: 'steelblue',
+	},
+	friendButton: {
+		justifyContent: 'center',
+		alignItems: 'center',
+		height: '100%',
+		backgroundColor: 'salmon',
+	},
+	playButton: {
+		justifyContent: 'center',
+		alignItems: 'center',
+		height: '100%',
+		backgroundColor: 'indianred',
+		padding: 30,
 	},
 });
-
-interface GolfCourse {
-	id: number;
-	clubname: string;
-	city: string;
-	state: string;
-	tees: TeeBox[];
-}
-
-interface TeeBox {
-	name: string;
-	gender: string;
-	par: number;
-	courseRating: number;
-	bogeyRating: number;
-	slopeRating: number;
-}

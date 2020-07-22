@@ -7,6 +7,15 @@ export function findWithId(array: any[], value: number) {
 	return -1;
 }
 
+export function findWithClubname(array: any[], clubname: string) {
+	for (let i = 0; i < array.length; i++) {
+		if (array[i]['clubname'] === clubname) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 export function calculateDiff(
 	score: number,
 	courseRating: number,

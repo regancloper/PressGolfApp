@@ -6,19 +6,21 @@ interface PickerModalProps {
 	visible: boolean;
 	items: string[];
 	title: string;
-	// onClose: () => void;
-	// onSelect: () => void;
-	// value?: string;
+	onClose: () => void;
+	onSelect: (value: string) => void;
+	value: string;
 }
 
 export const PickerModal: React.FC<PickerModalProps> = ({
 	visible,
 	items,
 	title,
-	// onClose,
-	// onSelect,
+	onClose,
+	onSelect,
+	value,
 }) => {
-	const [value, setValue] = useState<string>('Apple');
+	const [pickerValue, setPickerValue] = useState<string>(value);
+	const [priorValue, setPriorValue] = useState<string>(value);
 
 	return (
 		<Modal animated transparent visible={visible} animationType="fade">
@@ -26,19 +28,32 @@ export const PickerModal: React.FC<PickerModalProps> = ({
 				<View style={styles.pickerContainer}>
 					<View style={styles.header}>
 						<AntDesign
+							name="close"
+							size={24}
+							color="indianred"
+							onPress={() => {
+								onClose();
+								if (pickerValue !== priorValue) setPickerValue(priorValue);
+							}}
+						/>
+						<Text style={{ fontSize: 18 }}>{title || 'Placeholder'}</Text>
+						<AntDesign
 							name="check"
 							size={24}
 							color="#28a745"
-							onPress={() => console.log('')}
+							onPress={() => {
+								onSelect(pickerValue);
+								setPriorValue(pickerValue);
+								onClose();
+							}}
 						/>
-						<Text style={{ fontSize: 18 }}>{title || 'Placeholder'}</Text>
-						<AntDesign name="close" size={24} color="indianred" />
 					</View>
 					<Picker
 						style={styles.picker}
-						selectedValue={value}
-						onValueChange={item => setValue(item)}
+						selectedValue={pickerValue}
+						onValueChange={item => setPickerValue(item)}
 					>
+						<Picker.Item value="Select Fruit" label="Select Fruit" />
 						{items.map((item, index) => (
 							<Picker.Item key={index} value={item} label={item} />
 						))}
