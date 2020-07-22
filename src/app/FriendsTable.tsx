@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { Friend } from '../utils/types';
 import { Center } from '../shared/Center';
 
@@ -26,7 +26,7 @@ export const FriendsTable: React.FC<FriendsTableProps> = ({ friends }) => {
 				>
 					<Text style={styles.bold}>Golfer</Text>
 				</View>
-				<View style={{ flex: 1, alignSelf: 'stretch' }}>
+				<View style={{ flex: 1, alignSelf: 'stretch', marginLeft: 32 }}>
 					<Text style={styles.bold}>Index</Text>
 				</View>
 			</View>
@@ -37,7 +37,7 @@ export const FriendsTable: React.FC<FriendsTableProps> = ({ friends }) => {
 		return friends.map(friend => {
 			return (
 				<View
-					key={friend.userid}
+					key={`${friend.lastname}-${friend.id}`}
 					style={{
 						flex: 1,
 						alignSelf: 'stretch',
@@ -51,12 +51,12 @@ export const FriendsTable: React.FC<FriendsTableProps> = ({ friends }) => {
 							alignSelf: 'stretch',
 						}}
 					>
-						<Text>
+						<Text style={{ fontSize: 20 }}>
 							{friend.firstname} {friend.lastname}
 						</Text>
 					</View>
-					<View style={{ flex: 1, alignSelf: 'stretch' }}>
-						<Text>{friend.index || 'NI'}</Text>
+					<View style={{ flex: 1, alignSelf: 'stretch', marginLeft: 32 }}>
+						<Text style={{ fontSize: 20 }}>{friend.index || 'NI'}</Text>
 					</View>
 				</View>
 			);
@@ -73,5 +73,6 @@ export const FriendsTable: React.FC<FriendsTableProps> = ({ friends }) => {
 const styles = StyleSheet.create({
 	bold: {
 		fontWeight: 'bold',
+		fontSize: 24,
 	},
 });

@@ -4,7 +4,7 @@ import { AppParamList } from '../types/AppParamList';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { Post } from './Post';
 import { Profile } from './Profile';
-import { PlaySetup } from './PlaySetup';
+import { Play } from './Play';
 
 interface AppTabsProps {}
 
@@ -31,7 +31,7 @@ export const AppTabs: React.FC<AppTabsProps> = ({}) => {
 		>
 			<Tabs.Screen name="Profile" component={Profile} />
 			<Tabs.Screen name="Post" component={Post} />
-			<Tabs.Screen name="Play" component={PlaySetup} />
+			<Tabs.Screen name="Play" component={Play} />
 		</Tabs.Navigator>
 	);
 };

@@ -1,14 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import {
-	View,
-	Picker,
-	Text,
-	StyleSheet,
-	ActivityIndicator,
-	TextInput,
-} from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { View, Picker, Text, StyleSheet, TextInput } from 'react-native';
 import { apiService } from '../utils/api';
-import { Center } from '../shared/Center';
 import {
 	findWithId,
 	calculateDiff,
@@ -16,10 +8,18 @@ import {
 } from '../utils/calculations';
 import { AppButton } from '../shared/AppButton';
 import { TableScore } from '../utils/types';
+import { LoadingCircle } from '../shared/LoadingCircle';
+import { AuthContext } from '../auth/AuthProvider';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { AppParamList } from '../types/AppParamList';
 
-interface PostProps {}
+interface PostProps {
+	navigation: StackNavigationProp<AppParamList, 'Post'>;
+}
 
-export const Post: React.FC<PostProps> = ({}) => {
+export const Post: React.FC<PostProps> = ({ navigation }) => {
+	const { postNewData } = useContext(AuthContext);
+
 	const [courses, setCourses] = useState<GolfCourse[]>([]);
 	const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
 	const [teeBoxOptions, setTeeBoxOptions] = useState<TeeBox[]>([]);
@@ -134,18 +134,16 @@ export const Post: React.FC<PostProps> = ({}) => {
 			);
 			console.log('finished posting!!');
 		}
+		postNewData();
+		setSelectedCourse(null);
+		handleCourseSelect('0');
+		setScore('');
 
-		// if (result) {
-		// 	history.push('/');
-		// }
+		navigation.navigate('Profile');
 	};
 
 	if (loading) {
-		return (
-			<Center>
-				<ActivityIndicator size="large" />
-			</Center>
-		);
+		return <LoadingCircle />;
 	}
 
 	return (

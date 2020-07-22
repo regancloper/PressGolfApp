@@ -1,22 +1,28 @@
 import React, { useState } from 'react';
 import { AsyncStorage } from 'react-native';
 
-type User = null | { userid: number; role: string };
+type User = { userid: number; role: string };
 
 export const AuthContext = React.createContext<{
 	user: User;
 	login: () => void;
 	logout: () => void;
+	numPosts: number;
+	postNewData: () => void;
 }>({
-	user: null,
+	user: { userid: 0, role: 'guest' },
 	login: () => {},
 	logout: () => {},
+	numPosts: 0,
+	postNewData: () => {},
 });
 
 interface AuthProviderProps {}
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-	const [user, setUser] = useState<User>(null);
+	const [user, setUser] = useState<User>({ userid: 0, role: 'guest' });
+	const [numPosts, setNumPosts] = useState(0);
+
 	return (
 		<AuthContext.Provider
 			value={{
@@ -27,9 +33,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 					AsyncStorage.setItem('user', JSON.stringify(fakeUser));
 				},
 				logout: () => {
-					setUser(null);
+					setUser({ userid: 0, role: 'guest' });
 					AsyncStorage.removeItem('user');
 				},
+				numPosts,
+				postNewData: () => setNumPosts(numPosts + 1),
 			}}
 		>
 			{children}

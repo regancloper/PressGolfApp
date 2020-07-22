@@ -1,20 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Card } from '../shared/Card';
 import { apiService } from '../utils/api';
 import { ScoreTableRow } from './ScoreTableRow';
 import { LoadingCircle } from '../shared/LoadingCircle';
+import { AuthContext } from '../auth/AuthProvider';
 
-interface ScoreTableProps {}
+interface ScoreTableProps {
+	userid: number;
+}
 
-export const ScoreTable: React.FC<ScoreTableProps> = ({}) => {
+export const ScoreTable: React.FC<ScoreTableProps> = ({ userid }) => {
+	const { numPosts } = useContext(AuthContext);
+
 	const [scores, setScores] = useState<TableScore[]>([]);
 	const [loading, setLoading] = useState(true);
 
 	const getScoreData = async () => {
 		try {
 			let scores = await apiService(
-				'https://pressgolfapp.herokuapp.com/api/scores/8'
+				`https://pressgolfapp.herokuapp.com/api/scores/${userid}`
 			);
 			setScores(scores);
 		} catch (error) {
@@ -26,7 +31,7 @@ export const ScoreTable: React.FC<ScoreTableProps> = ({}) => {
 
 	useEffect(() => {
 		getScoreData();
-	}, []);
+	}, [numPosts]);
 
 	const renderHeader = () => {
 		return (

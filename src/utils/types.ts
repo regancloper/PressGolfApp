@@ -30,7 +30,7 @@ export interface TableScore {
 }
 
 export interface Friend {
-	userid: number;
+	id: number;
 	firstname: string;
 	lastname: string;
 	index: number;

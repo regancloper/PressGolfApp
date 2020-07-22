@@ -19,14 +19,14 @@ export const Routes: React.FC<RoutesProps> = ({}) => {
 	useEffect(() => {
 		// check if the user is logged in or not
 		AsyncStorage.getItem('user')
-			.then((userString) => {
+			.then(userString => {
 				if (userString) {
 					// decode it
 					login();
 				}
 				setLoading(false);
 			})
-			.catch((err) => {
+			.catch(err => {
 				console.log(err);
 			});
 	}, []);
@@ -42,7 +42,7 @@ export const Routes: React.FC<RoutesProps> = ({}) => {
 	return (
 		<NavigationContainer>
 			<Stack.Navigator>
-				{user ? (
+				{user.userid ? (
 					<Stack.Screen
 						name="AppTabs"
 						component={AppTabs}
