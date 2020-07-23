@@ -107,6 +107,14 @@ export const PlaySetup: React.FC<PlaySetupProps> = ({ navigation }) => {
 	const handleCourseSelect = (course: GolfCourse) => {
 		setLoading(true);
 		setSelectedCourse(course);
+		setSelectedTee({
+			name: '',
+			gender: '',
+			par: 0,
+			courseRating: 0,
+			bogeyRating: 0,
+			slopeRating: 0,
+		});
 		if (course.clubname === 'Select Your Course') {
 			setTeeBoxOptions([]);
 			setSelectedTee({
@@ -198,8 +206,19 @@ export const PlaySetup: React.FC<PlaySetupProps> = ({ navigation }) => {
 				</TouchableOpacity>
 			</View>
 			<View style={styles.subContainer}>
-				<TouchableOpacity style={styles.playButton}>
-					<Text style={{ fontSize: 32, color: '#fff' }}>Play Golf</Text>
+				<TouchableOpacity
+					disabled={selectedCourse.id === 0 || selectedTee.name === ''}
+					onPress={() =>
+						navigation.navigate('Scorecard', {
+							selectedCourseId: selectedCourse.id,
+							selectedCourseName: selectedCourse.clubname,
+							selectedTee,
+							playingPartner,
+						})
+					}
+					style={styles.playButton}
+				>
+					<Text style={{ fontSize: 32, color: '#fff' }}>Start Round</Text>
 				</TouchableOpacity>
 			</View>
 
