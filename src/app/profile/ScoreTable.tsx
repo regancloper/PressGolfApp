@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Card } from '../shared/Card';
-import { apiService } from '../utils/api';
+import { Card } from '../../shared/Card';
+import { apiService } from '../../utils/api';
 import { ScoreTableRow } from './ScoreTableRow';
-import { LoadingCircle } from '../shared/LoadingCircle';
-import { AuthContext } from '../auth/AuthProvider';
+import { LoadingCircle } from '../../shared/LoadingCircle';
+import { AuthContext } from '../../auth/AuthProvider';
 
 interface ScoreTableProps {
 	userid: number;

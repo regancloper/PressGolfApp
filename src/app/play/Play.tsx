@@ -1,9 +1,8 @@
 import React, { useContext } from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { PlayParamList } from '../types/PlayParamList';
+import { PlayParamList } from '../../types/PlayParamList';
 import { PlaySetup } from './PlaySetup';
 import { Scorecard } from './Scorecard';
-import { AuthContext } from '../auth/AuthProvider';
 
 interface PlayProps {}
 

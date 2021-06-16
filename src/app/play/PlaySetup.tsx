@@ -8,16 +8,16 @@ import {
 	TouchableOpacity,
 	TextInput,
 } from 'react-native';
-import { apiService } from '../utils/api';
-import { findWithId } from '../utils/calculations';
-import { Friend, GolfCourse, TeeBox } from '../utils/types';
-import { PlayParamList } from '../types/PlayParamList';
+import { apiService } from '../../utils/api';
+import { findWithId } from '../../utils/calculations';
+import { Friend, GolfCourse, TeeBox } from '../../utils/types';
+import { PlayParamList } from '../../types/PlayParamList';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { AuthContext } from '../auth/AuthProvider';
-import { LoadingCircle } from '../shared/LoadingCircle';
-import { CoursePicker } from '../pickers/CoursePicker';
-import { TeePicker } from '../pickers/TeePicker';
-import { FriendPicker } from '../pickers/FriendPicker';
+import { AuthContext } from '../../auth/AuthProvider';
+import { LoadingCircle } from '../../shared/LoadingCircle';
+import { CoursePicker } from '../../pickers/CoursePicker';
+import { TeePicker } from '../../pickers/TeePicker';
+import { FriendPicker } from '../../pickers/FriendPicker';
 
 interface PlaySetupProps {
 	navigation: StackNavigationProp<PlayParamList, 'PlaySetup'>;

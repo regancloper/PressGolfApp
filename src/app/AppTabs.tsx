@@ -2,9 +2,9 @@ import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AppParamList } from '../types/AppParamList';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import { Post } from './Post';
-import { Profile } from './Profile';
-import { Play } from './Play';
+import { Post } from './post/Post';
+import { Profile } from './profile/Profile';
+import { Play } from './play/Play';
 
 interface AppTabsProps {}
 

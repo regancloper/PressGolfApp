@@ -3,11 +3,11 @@ import { View, ScrollView, Text } from 'react-native';
 import { IndexCard } from './IndexCard';
 import { FriendsCard } from './FriendsCard';
 import { ScoreTable } from './ScoreTable';
-import { AuthContext } from '../auth/AuthProvider';
-import { PlayerProfile } from '../utils/types';
-import { apiService } from '../utils/api';
+import { AuthContext } from '../../auth/AuthProvider';
+import { PlayerProfile } from '../../utils/types';
+import { apiService } from '../../utils/api';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { AppParamList } from '../types/AppParamList';
+import { AppParamList } from '../../types/AppParamList';
 
 interface ProfileProps {
 	navigation: StackNavigationProp<AppParamList, 'Profile'>;

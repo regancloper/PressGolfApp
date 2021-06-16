@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Friend } from '../utils/types';
-import { Center } from '../shared/Center';
+import { Friend } from '../../utils/types';
+import { Center } from '../../shared/Center';
 
 interface FriendsTableProps {
 	friends: Friend[];

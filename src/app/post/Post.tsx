@@ -6,19 +6,19 @@ import {
 	TextInput,
 	TouchableOpacity,
 } from 'react-native';
-import { apiService } from '../utils/api';
+import { apiService } from '../../utils/api';
 import {
 	findWithId,
 	calculateDiff,
 	calculateIndex,
-} from '../utils/calculations';
-import { TableScore, GolfCourse, TeeBox } from '../utils/types';
-import { LoadingCircle } from '../shared/LoadingCircle';
-import { AuthContext } from '../auth/AuthProvider';
+} from '../../utils/calculations';
+import { TableScore, GolfCourse, TeeBox } from '../../utils/types';
+import { LoadingCircle } from '../../shared/LoadingCircle';
+import { AuthContext } from '../../auth/AuthProvider';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { AppParamList } from '../types/AppParamList';
-import { CoursePicker } from '../pickers/CoursePicker';
-import { TeePicker } from '../pickers/TeePicker';
+import { AppParamList } from '../../types/AppParamList';
+import { CoursePicker } from '../../pickers/CoursePicker';
+import { TeePicker } from '../../pickers/TeePicker';
 
 interface PostProps {
 	navigation: StackNavigationProp<AppParamList, 'Post'>;
@@ -223,7 +223,7 @@ export const Post: React.FC<PostProps> = ({ navigation }) => {
 						backgroundColor: '#fff',
 					}}
 					placeholder="Enter Score"
-					onChangeText={score => setScore(score)}
+					onChangeText={(score) => setScore(score)}
 					value={score}
 					// keyboardType="number-pad"
 				/>
@@ -243,14 +243,14 @@ export const Post: React.FC<PostProps> = ({ navigation }) => {
 				visible={showCoursePicker}
 				courses={courses}
 				onClose={() => setShowCoursePicker(false)}
-				onSelect={course => handleCourseSelect(course)}
+				onSelect={(course) => handleCourseSelect(course)}
 				value={selectedCourse}
 			/>
 			<TeePicker
 				visible={showTeePicker}
 				tees={teeBoxOptions}
 				onClose={() => setShowTeePicker(false)}
-				onSelect={teeBox => handleTeeSelect(teeBox)}
+				onSelect={(teeBox) => handleTeeSelect(teeBox)}
 				value={selectedTee}
 			/>
 		</View>

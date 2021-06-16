@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Center } from '../shared/Center';
-import { LoadingCircle } from '../shared/LoadingCircle';
+import { Center } from '../../shared/Center';
+import { LoadingCircle } from '../../shared/LoadingCircle';
 import { FriendsTable } from './FriendsTable';
-import { apiService } from '../utils/api';
-import { Friend } from '../utils/types';
+import { apiService } from '../../utils/api';
+import { Friend } from '../../utils/types';
 import AddFriend from './AddFriend';
-import { AuthContext } from '../auth/AuthProvider';
+import { AuthContext } from '../../auth/AuthProvider';
 
 interface FriendsCardProps {
 	userid: number;

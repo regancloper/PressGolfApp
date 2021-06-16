@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, Button } from 'react-native';
-import { Center } from '../shared/Center';
+import { Center } from '../../shared/Center';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { AppParamList } from '../types/AppParamList';
+import { AppParamList } from '../../types/AppParamList';
 
 interface IndexCardProps {
 	navigation: StackNavigationProp<AppParamList, 'Profile'>;

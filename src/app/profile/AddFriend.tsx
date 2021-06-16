@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Friend, Player } from '../utils/types';
-import { apiService } from '../utils/api';
+import { Friend, Player } from '../../utils/types';
+import { apiService } from '../../utils/api';
 import { TouchableOpacity, Text, View, Picker } from 'react-native';
-import { AuthContext } from '../auth/AuthProvider';
+import { AuthContext } from '../../auth/AuthProvider';
 
 interface AddFriendProps {
 	userid: number;
